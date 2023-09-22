@@ -23,9 +23,11 @@ def viwebook(request):
 
 def borowbook(request):
     # ____condition to show the user how login
-    account = Myaccount.objects.get(id=1)
+    account = Myaccount.objects.get(id = request.session['userid'])
+    acc_id = account.id
     # ____condition to show the user books
-    dataa = account.borrowbook_set.all()
+    borrow_acc_id = borrowbook.objects.filter(account = acc_id)
+    dataa = books.objects.filter(id = borrow_acc_id)
     # dsd = dataa.books.objects.all()
     # dsd = borrowbook.books.objects.all
     context = {'dataa': dataa}

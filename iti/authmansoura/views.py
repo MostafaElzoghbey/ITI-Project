@@ -82,11 +82,12 @@ def Insert_Book(req):
         
         form=Newbookform(req.POST, req.FILES)
         
-        
+        if(form.is_valid()):
             
-        form.save()
-        return  HttpResponseRedirect('/admindashboard')
-        
+            form.save()
+            return  HttpResponseRedirect('/admindashboard')
+        else:
+            context['msg']='enter valid data'
             
     context['form']=form
 
