@@ -31,4 +31,11 @@ urlpatterns = [
     path('bookdetail', viwebook, name='bookdetail'),
     path('borowbook', borowbook, name='borowbook'),
 
+    path('admindashboard', AdminDashboard, name='admindashboard'),
+    path('Insert_Book',Insert_Book,name='Insert_Book'),
+    path('Update_Book/<int:ID>',Update_Book,name='Update_Book'),
+    path('Delete_Book/<int:ID>',Delete_Book,name='Delete_Book'),
+    
+    path('search_student/', search_student, name='search_student'),
+    
 ]

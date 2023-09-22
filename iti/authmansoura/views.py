@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .form import *
 import sys
 from .models import *
-
+from students.models import *
 
 # Create your views here.
 def myRegister(request):
@@ -25,6 +25,10 @@ def mylogin(request):
                 request.session['userid'] = obj[0].id
                 request.session['username'] = obj[0].username
                 request.session['account'] = obj[0].account
+                if obj[0].is_admin == 'true':
+                    request.session['is_admin'] = 1
+                else:
+                    request.session['is_admin'] = 0
                 return HttpResponseRedirect('/')
             else:
                 context['msg'] = 'invalide username or password'
@@ -41,7 +45,7 @@ def mylogout(request):
 
 
 def myprofile(request):
-    context = {'profile': Myaccount.objects.all()}
+    context = {'profile':[ Myaccount.objects.filter(id = request.session['userid'])[0] ]}
     return render(request, 'profile.html', context)
 
 
@@ -55,3 +59,85 @@ def Update_profile(req, ID):
             return HttpResponseRedirect('/profile')
     context = {'form': form}
     return render(req, 'updateProfile.html', context)
+
+
+def AdminDashboard(req):
+
+    bookss = books.objects.all()
+    users = Myaccount.objects.all()
+
+    context = {
+        'books': bookss,
+        'users': users,
+    }
+    
+    return render(req, 'admindashboard.html', context)
+
+
+def Insert_Book(req):
+    
+    form=Newbookform()
+    context={}
+    if(req.method=='POST'):
+        
+        form=Newbookform(req.POST, req.FILES)
+        
+        
+            
+        form.save()
+        return  HttpResponseRedirect('/admindashboard')
+        
+            
+    context['form']=form
+
+    return render(req,'insertbook.html',context)
+
+
+def Update_Book(req,ID):
+    
+    book=books.objects.get(id=ID)
+    form=Newbookform(instance=book)
+    if(req.method=='POST'):
+        
+        f=Newbookform(req.POST,instance=book)
+
+        if(f.is_valid()):
+            
+            f.save()
+            return  HttpResponseRedirect('/admindashboard')
+        
+    context={'form':form}
+    
+    return render(req,'updatebook.html',context)
+
+
+def Delete_Book(req,ID):
+    
+    books.objects.get(id=ID).delete()
+    
+    return HttpResponseRedirect('/admindashboard')
+
+
+def search_student(request):
+    
+    bookss = books.objects.all()
+    users = Myaccount.objects.all()
+
+    context = {
+        'books': bookss,
+        'users': users,
+    }
+
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+
+        student = Myaccount.objects.get(id=student_id)
+
+        context = {
+        'books': bookss,
+        'users': [student],
+    }
+        return render(request, 'admindashboard.html', context)
+
+    else:
+        return render(request, 'admindashboard.html', context)
