@@ -30,6 +30,7 @@ urlpatterns = [
     path('Update_profile/<int:ID>', Update_profile, name='Update_profile'),
     path('bookdetail', viwebook, name='bookdetail'),
     path('borowbook', borowbook, name='borowbook'),
+    path('borrow_click', borrow_click, name='borrow_click'),
 
     path('admindashboard', AdminDashboard, name='admindashboard'),
     path('Insert_Book',Insert_Book,name='Insert_Book'),
