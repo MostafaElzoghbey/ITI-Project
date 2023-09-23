@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import *
@@ -21,15 +22,42 @@ def viwebook(request):
     return render(request, 'index.html')
 
 
-def borowbook(request):
-    # ____condition to show the user how login
-    account = Myaccount.objects.get(id = request.session['userid'])
-    acc_id = account.id
-    # ____condition to show the user books
-    borrow_acc_id = borrowbook.objects.filter(account = acc_id)
-    dataa = books.objects.filter(id = borrow_acc_id)
-    # dsd = dataa.books.objects.all()
-    # dsd = borrowbook.books.objects.all
-    context = {'dataa': dataa}
+# def borowbook(request):
+#     # ____condition to show the user how login
+#     # acc_id = account.id
+#     # ____condition to show the user books
+#     # borrow_acc_id = borrowbook.objects.filter(account = acc_id)
+#     # dataa = books.objects.filter(id = borrow_acc_id)
+#     # dsd = dataa.books.objects.all()
+#     # dsd = borrowbook.books.objects.all
+#     # context = {'dataa': dataa}
+#     student = Myaccount.objects.get(id = request.session['userid'])
+#     book = books.objects.get(id=request.POST['book_id'])
 
-    return render(request, 'borwoedbooks.html', context)
+#     return render(request, 'borwoedbooks.html', context)
+
+def borowbook(request):
+    student = Myaccount.objects.get(id=request.user.id)
+    book = books.objects.get(id=request.POST['book_id'])
+
+    # Check if the book is available
+    if book.available:
+        # Create a new BookBorrowing object
+        book_borrowing = borrowbook(
+            student=student,
+            book=book,
+            borrowed_date=datetime.date.today(),
+            due_date=datetime.date.today() + datetime.timedelta(days=14)
+        )
+
+        book_borrowing.save()
+
+        # Update the book's availability status
+        book.available = False
+        book.save()
+
+        # Redirect the user to a success page
+        return HttpResponseRedirect('/books/success/')
+    else:
+        # Redirect the user to an error page
+        return HttpResponseRedirect('/books/error/')
